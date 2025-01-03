@@ -1,14 +1,41 @@
 import tkinter as tk
 from datetime import datetime
+import json
+import os
 from tkinter import ttk  # For better looking widgets
 
 def get_current_time():
     return datetime.now().strftime("%I:%M %p")
 
-
 root = tk.Tk()
 root.title("Generic Gui Task Manager")
 root.geometry("800x600")
+
+# Create listbox to display tasks
+task_list = tk.Listbox(root, height=20, width=70)
+task_list.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+
+
+TASKS_FILE = "tasks.json"
+
+# Function to load tasks
+def load_tasks():
+    if os.path.exists(TASKS_FILE):
+        with open(TASKS_FILE, "r") as file:
+            tasks = json.load(file)
+            for task in tasks:
+                task_list.insert(tk.END, task)
+
+# Function to save tasks
+def save_tasks():
+    tasks = task_list.get(0, tk.END)
+    with open(TASKS_FILE, "w") as file:
+        json.dump(tasks, file)
+
+# Load tasks when the application starts
+load_tasks()
+
+# Create the root window
 
 # Create task input area
 input_frame = ttk.Frame(root, padding="10")
@@ -26,6 +53,7 @@ time_label.grid(row=0, column=2, padx=5, pady=5)
 time_entry = ttk.Entry(input_frame, width=10)
 time_entry.grid(row=0, column=3, padx=5, pady=5)
 
+"""
 # Create "Time Until" column
 time_until_label = ttk.Label(input_frame, text="Time Until:")
 time_until_label.grid(row=0, column=6, padx=5, pady=5)
@@ -33,6 +61,8 @@ time_until_label.grid(row=0, column=6, padx=5, pady=5)
 time_until_var = tk.StringVar()
 time_until_entry = ttk.Entry(input_frame, textvariable=time_until_var, width=10, state='readonly')
 time_until_entry.grid(row=0, column=7, padx=5, pady=5)
+"""
+
 # Create dropdown menu for AM/PM
 ampm_label = ttk.Label(input_frame, text="AM/PM:")
 ampm_label.grid(row=0, column=4, padx=5, pady=5)
@@ -58,11 +88,6 @@ time_entry.bind("<KeyRelease>", update_time_until)
 ampm_var.trace("w", update_time_until)
 
 
-
-# Create listbox to display tasks
-task_list = tk.Listbox(root, height=20, width=70)
-task_list.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
-
 # Function to add tasks
 def add_task():
     task = task_entry.get()
@@ -80,6 +105,9 @@ def delete_task():
         task_list.delete(selected)
     except:
         pass
+
+# Save tasks when the application closes
+root.protocol("WM_DELETE_WINDOW", lambda: [save_tasks(), root.destroy()])
 
 # Add buttons
 button_frame = ttk.Frame(root, padding="10")
