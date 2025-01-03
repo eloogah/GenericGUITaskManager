@@ -10,6 +10,7 @@ def get_current_time():
 root = tk.Tk()
 root.title("Generic Gui Task Manager")
 root.geometry("800x600")
+root.configure(bg='#2C3E50')
 
 # Create listbox to display tasks
 task_list = tk.Listbox(root, height=20, width=70)
@@ -72,6 +73,7 @@ ampm_dropdown = ttk.Combobox(input_frame, textvariable=ampm_var, values=["AM", "
 ampm_dropdown.grid(row=0, column=5, padx=5, pady=5)
 ampm_dropdown.current(0)
 
+"""
 def update_time_until(*args):
     try:
         task_time_str = time_entry.get() + " " + ampm_var.get()
@@ -84,9 +86,10 @@ def update_time_until(*args):
     except ValueError:
         time_until_var.set("Invalid time")
 
+
 time_entry.bind("<KeyRelease>", update_time_until)
 ampm_var.trace("w", update_time_until)
-
+"""
 
 # Function to add tasks
 def add_task():
@@ -106,6 +109,24 @@ def delete_task():
     except:
         pass
 
+def priority_down():
+    try:
+        selected = task_list.curselection()
+        task = task_list.get(selected)
+        task_list.delete(selected)
+        task_list.insert(selected[0] + 1, task)
+    except:
+        pass
+
+def priority_up():
+    try:
+        selected = task_list.curselection()
+        task = task_list.get(selected)
+        task_list.delete(selected)
+        task_list.insert(selected[0] - 1, task)
+    except:
+        pass
+
 # Save tasks when the application closes
 root.protocol("WM_DELETE_WINDOW", lambda: [save_tasks(), root.destroy()])
 
@@ -118,6 +139,12 @@ add_button.grid(row=0, column=0, padx=5, pady=5)
 
 delete_button = ttk.Button(button_frame, text="Delete Task", command=delete_task)
 delete_button.grid(row=0, column=1, padx=5, pady=5)
+
+priority_up_button = ttk.Button(button_frame, text="Priority Up", command=priority_up)
+priority_up_button.grid(row=0, column=2, padx=5, pady=5)
+
+priority_down_button = ttk.Button(button_frame, text="Priority Down", command=priority_down)
+priority_down_button.grid(row=0, column=3, padx=5, pady=5)
 
 # Allow the columns and rows to expand with window resizing
 root.grid_columnconfigure(0, weight=1)
